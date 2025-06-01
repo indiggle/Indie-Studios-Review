@@ -57,10 +57,11 @@
   <textarea id="review" rows="5" placeholder="Write your review here..."></textarea>
   <input type="text" id="name" placeholder="Your name..." />
   
-  <label>
-    <input type="checkbox" id="anonymous" />
-    Check this box if you’d like to remain anonymous
-  </label>
+  <div style="margin-top: 10px; display: flex; align-items: center;">
+  <input type="checkbox" id="anonymous" style="margin-right: 8px;" />
+  <label for="anonymous" style="margin: 0;">Check this box if you’d like to remain anonymous</label>
+</div>
+
   
   <button onclick="submitReview()">Submit</button>
 
