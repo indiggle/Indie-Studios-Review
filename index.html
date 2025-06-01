@@ -16,10 +16,13 @@
       cursor: pointer;
       font-size: 2rem;
       color: lightgray;
+      flex-direction: row; /* Left to right */
     }
-    .stars span:hover,
-    .stars span:hover ~ span,
-    .stars .selected {
+    .stars span {
+      transition: color 0.2s;
+    }
+    .stars span.hovered,
+    .stars span.selected {
       color: gold;
     }
     textarea, input {
@@ -27,6 +30,10 @@
       margin-top: 10px;
       padding: 10px;
       font-size: 1rem;
+    }
+    label {
+      display: block;
+      margin-top: 10px;
     }
     button {
       margin-top: 15px;
@@ -38,60 +45,91 @@
 </head>
 <body>
   <h2>Leave a Review</h2>
+
   <div class="stars" id="star-rating">
-    <span data-value="5">&#9733;</span>
-    <span data-value="4">&#9733;</span>
-    <span data-value="3">&#9733;</span>
-    <span data-value="2">&#9733;</span>
     <span data-value="1">&#9733;</span>
+    <span data-value="2">&#9733;</span>
+    <span data-value="3">&#9733;</span>
+    <span data-value="4">&#9733;</span>
+    <span data-value="5">&#9733;</span>
   </div>
 
   <textarea id="review" rows="5" placeholder="Write your review here..."></textarea>
   <input type="text" id="name" placeholder="Your name..." />
+  
+  <label>
+    <input type="checkbox" id="anonymous" />
+    Check this box if you’d like to remain anonymous
+  </label>
+  
   <button onclick="submitReview()">Submit</button>
 
   <script>
     let selectedRating = 0;
     const stars = document.querySelectorAll("#star-rating span");
 
-    stars.forEach(star => {
+    stars.forEach((star, index) => {
+      // Hover effect
+      star.addEventListener("mouseover", () => {
+        resetStars();
+        for (let i = 0; i <= index; i++) {
+          stars[i].classList.add("hovered");
+        }
+      });
+
+      // Remove hover on mouseout
+      star.addEventListener("mouseout", () => {
+        resetStars();
+      });
+
+      // Click to select rating
       star.addEventListener("click", () => {
-        selectedRating = star.getAttribute("data-value");
-        stars.forEach(s => s.classList.remove("selected"));
-        star.classList.add("selected");
-        let found = false;
-        stars.forEach(s => {
-          if (s === star) found = true;
-          if (!found) s.classList.add("selected");
-        });
+        selectedRating = parseInt(star.getAttribute("data-value"));
+        updateSelectedStars(selectedRating);
       });
     });
 
-    function submitReview() {
-      const reviewText = document.getElementById("review").value;
-      const name = document.getElementById("name").value;
+    function resetStars() {
+      stars.forEach(star => star.classList.remove("hovered", "selected"));
+      if (selectedRating > 0) {
+        for (let i = 0; i < selectedRating; i++) {
+          stars[i].classList.add("selected");
+        }
+      }
+    }
 
-      if (selectedRating == 0 || reviewText === "" || name === "") {
-        alert("Please fill in all fields and select a star rating.");
+    function updateSelectedStars(rating) {
+      stars.forEach(star => star.classList.remove("selected"));
+      for (let i = 0; i < rating; i++) {
+        stars[i].classList.add("selected");
+      }
+    }
+
+    function submitReview() {
+      const reviewText = document.getElementById("review").value.trim();
+      const nameInput = document.getElementById("name").value.trim();
+      const anonymousChecked = document.getElementById("anonymous").checked;
+      const nameToSubmit = anonymousChecked ? "Anonymous" : nameInput;
+
+      if (selectedRating === 0 || reviewText === "") {
+        alert("Please select a star rating and write your review.");
         return;
       }
 
-      // Replace with your actual SheetDB API endpoint
+      // Replace with your actual SheetDB API URL
       const url = "https://sheetdb.io/api/v1/5dt838ys1w4cs";
 
       const data = {
         data: {
           rating: selectedRating,
           review: reviewText,
-          name: name
+          name: nameToSubmit
         }
       };
 
       fetch(url, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data)
       })
       .then(response => {
@@ -99,8 +137,9 @@
           alert("Thanks for your review!");
           document.getElementById("review").value = "";
           document.getElementById("name").value = "";
+          document.getElementById("anonymous").checked = false;
           selectedRating = 0;
-          stars.forEach(s => s.classList.remove("selected"));
+          resetStars();
         } else {
           alert("Failed to send review.");
         }
