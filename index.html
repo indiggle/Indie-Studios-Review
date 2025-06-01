@@ -16,7 +16,7 @@
       cursor: pointer;
       font-size: 2rem;
       color: lightgray;
-      flex-direction: row; /* Left to right */
+      flex-direction: row;
     }
     .stars span {
       transition: color 0.2s;
@@ -25,7 +25,7 @@
     .stars span.selected {
       color: gold;
     }
-    textarea, input {
+    textarea, input[type="text"] {
       width: 100%;
       margin-top: 10px;
       padding: 10px;
@@ -34,6 +34,10 @@
     label {
       display: block;
       margin-top: 10px;
+    }
+    .inline-label {
+      display: inline;
+      margin: 0;
     }
     button {
       margin-top: 15px;
@@ -58,11 +62,10 @@
   <input type="text" id="name" placeholder="Your name..." />
   
   <div style="margin-top: 10px; display: flex; align-items: center;">
-  <input type="checkbox" id="anonymous" style="margin-right: 8px;" />
-  <label for="anonymous" style="margin: 0;">Check this box if you’d like to remain anonymous</label>
-</div>
+    <input type="checkbox" id="anonymous" style="margin-right: 8px;" />
+    <label for="anonymous" class="inline-label">Check this box if you’d like to remain anonymous</label>
+  </div>
 
-  
   <button onclick="submitReview()">Submit</button>
 
   <script>
@@ -117,7 +120,6 @@
         return;
       }
 
-      // Replace with your actual SheetDB API URL
       const url = "https://sheetdb.io/api/v1/5dt838ys1w4cs";
 
       const data = {
