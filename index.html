@@ -45,18 +45,6 @@
       font-size: 1rem;
       cursor: pointer;
     }
-    .review {
-      border-top: 1px solid #ccc;
-      padding-top: 10px;
-      margin-top: 15px;
-    }
-    .review .meta {
-      font-size: 0.9rem;
-      color: #666;
-    }
-    .review .stars {
-      font-size: 1.2rem;
-    }
   </style>
 </head>
 <body>
@@ -79,9 +67,6 @@
   </div>
 
   <button onclick="submitReview()">Submit</button>
-
-  <h3>Recent Reviews</h3>
-  <div id="reviews"></div>
 
   <script>
     const API_URL = "https://sheetdb.io/api/v1/5dt838ys1w4cs";
@@ -171,41 +156,11 @@
           document.getElementById("anonymous").checked = false;
           selectedRating = 0;
           resetStars();
-          loadReviews();
         } else {
           alert("Failed to send review.");
         }
       });
     }
-
-    function loadReviews() {
-      fetch(API_URL)
-        .then(response => response.json())
-        .then(data => {
-          const reviewsContainer = document.getElementById("reviews");
-          reviewsContainer.innerHTML = "";
-
-          // Sort by most recent timestamp
-          data.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-
-          data.forEach(review => {
-            const reviewEl = document.createElement("div");
-            reviewEl.classList.add("review");
-
-            const starDisplay = "★".repeat(parseInt(review.rating)) + "☆".repeat(5 - parseInt(review.rating));
-
-            reviewEl.innerHTML = `
-              <div class="stars">${starDisplay}</div>
-              <p>${review.review}</p>
-              <div class="meta">– ${review.name} on ${review.timestamp}</div>
-            `;
-            reviewsContainer.appendChild(reviewEl);
-          });
-        });
-    }
-
-    // Load reviews when the page opens
-    loadReviews();
   </script>
 </body>
 </html>
